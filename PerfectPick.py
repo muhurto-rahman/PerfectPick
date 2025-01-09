@@ -40,37 +40,59 @@ chosenteammates = container.multiselect(label = "Pick 4 Agents",
 
 # STEP 1: Gather user inputs take in u.gg profileid and their team composition.
 
+
+#I'll use session state to store whether a profile has been scraped or not
+if "scraped_data" not in st.session_state:
+    st.session_state["scraped_data"] = None
+if "last_scraped_profileid" not in st.session_state:
+    st.session_state["last_scraped_profileid"] = None
+if "finalmodel" not in st.session_state:
+    st.session_state["finalmodel"] = None
+
 profileid = getprofileid
 
 teamcomp = chosenteammates
 
-if len(chosenteammates) == 4:
-    # STEP 2: Webscrape their u.gg profile (Approximately 5 minutes to run this part)
-    service = Service(executable_path="chromedriver.exe")
-    driver = webdriver.Chrome(service = service)
-    driver.get(f"https://u.gg/val/profile/{profileid.replace(' ','%20').replace('#','-')}")
-    time.sleep(5)
-    while True:
-        try:
-            input_element = driver.find_element(By.CSS_SELECTOR,
-                                                ".flex.items-center.justify-center.group.rounded-sm.px-4.py-2\\.5.text-\\[13px\\].font-bold.dark\\:bg-lavender-500.dark\\:hover\\:bg-lavender-600.dark\\:text-white.dark\\:ui-toggled\\:bg-lavender-500.dark\\:ui-toggled\\:font-bold.leading-none")
-            input_element.click()
-        except Exception as e:
-            print("No More Matches to Load", e)
-            break
-    time.sleep(7)
-    match_buttons = driver.find_elements(By.CSS_SELECTOR,
-                                        ".flex.flex-col.justify-around.select-none.w-full")
-    for i in match_buttons:
-        try:
-            i.click()
-            time.sleep(1)
-        except Exception as e:
-            print(f"Error occured while clicking on a button{e}")
-    page_source = driver.page_source
-    driver.quit()
 
-    soup = BeautifulSoup(page_source,"html")
+if len(chosenteammates) == 4 and profileid != st.session_state["last_scraped_profileid"]:
+    with st.spinner("Scraping Profile Data... May take up to 5 minutes"):
+        try:
+            st.session_state["last_scraped_profileid"] = profileid
+            # STEP 2: Webscrape their u.gg profile (Approximately 5 minutes to run this part)
+            service = Service(executable_path="chromedriver.exe")
+            driver = webdriver.Chrome(service = service)
+            driver.get(f"https://u.gg/val/profile/{profileid.replace(' ','%20').replace('#','-')}")
+            time.sleep(5)
+            while True:
+                try:
+                    input_element = driver.find_element(By.CSS_SELECTOR,
+                                                        ".flex.items-center.justify-center.group.rounded-sm.px-4.py-2\\.5.text-\\[13px\\].font-bold.dark\\:bg-lavender-500.dark\\:hover\\:bg-lavender-600.dark\\:text-white.dark\\:ui-toggled\\:bg-lavender-500.dark\\:ui-toggled\\:font-bold.leading-none")
+                    input_element.click()
+                except Exception as e:
+                    print("No More Matches to Load", e)
+                    break
+            time.sleep(7)
+            match_buttons = driver.find_elements(By.CSS_SELECTOR,
+                                                ".flex.flex-col.justify-around.select-none.w-full")
+            for i in match_buttons:
+                try:
+                    i.click()
+                    time.sleep(1)
+                except Exception as e:
+                    print(f"Error occured while clicking on a button{e}")
+            page_source = driver.page_source
+            driver.quit()
+            st.success("Finished Scraping!")
+
+            #Updating session state before creating model but after scraping data
+
+            st.session_state['scraped_data'] = page_source
+        except Exception as e:
+            print(f"Error while scraping: {e}")
+
+
+if len(chosenteammates) == 4 and st.session_state['scraped_data'] is not None:
+    soup = BeautifulSoup(st.session_state['scraped_data'],"html")
     defeats = soup.find_all("span", class_ = 'dark:text-accent-red-500 inline-block mr-2 text-md font-bold leading-[17px]')
     victories = soup.find_all("span", class_ = "dark:text-accent-green-300 inline-block mr-2 text-md font-bold leading-[17px]")
     matches = soup.find_all("div", class_ = "flex flex-col justify-around select-none w-full")
@@ -237,29 +259,31 @@ if len(chosenteammates) == 4:
 
     # THERES MULTIPLE AGENTS THAT HAVE A PREDICTED MAX WINRATE. If multiple, print agents that they should play.
     # Let's just print the top three agents for now
-        maxwinrate = max(winratelist)
-        maxindices = [i for i, j in sorted(enumerate(winratelist), key=lambda x: x[1], reverse=True)[:3]]
-        finalagents = []
-        finalwr = []
-        for i in maxindices:
-            finalagents.append(playerchoices[i])
-            finalwr.append(format(round(winratelist[i],3)*100,".1f")+"%")
-            #print(f"You should consider playing {playerchoices[i]} with a predicted winrate of {format(round(winratelist[i],3)*100,".1f")+"%"}")
-        finalresult = pd.DataFrame(
-            {"Agents:":finalagents,
-            "Predicted Winrate": finalwr}
-        )
-        finalresult.index += 1
+    maxwinrate = max(winratelist)
+    maxindices = [i for i, j in sorted(enumerate(winratelist), key=lambda x: x[1], reverse=True)[:3]]
+    finalagents = []
+    finalwr = []
+    for i in maxindices:
+        finalagents.append(playerchoices[i])
+        finalwr.append(format(round(winratelist[i],3)*100,".1f")+"%")
+        #print(f"You should consider playing {playerchoices[i]} with a predicted winrate of {format(round(winratelist[i],3)*100,".1f")+"%"}")
+    finalresult = pd.DataFrame(
+        {"Agents:":finalagents,
+        "Predicted Winrate": finalwr}
+    )
+    finalresult.index += 1
+    
+    #Update the Session State
+    st.session_state['finalmodel'] = finalresult
+    
+    st.write("\n")
+    st.write("\n")
+    st.write("\n")
+    st.write("\n")
+    st.write(f"Predicted Model Results with {str(round(max(testacclist),3)*100)+"%"} Accuracy:")
 
 
-
-st.write("\n")
-st.write("\n")
-st.write("\n")
-st.write("\n")
-
-if len(chosenteammates) < 4:
-    st.write("Please select 4 teammates")
-elif len(chosenteammates) == 4:
-    st.write("Hello I am just testing to see if literally any of this works")
-    st.write(finalresult)
+if st.session_state.get('finalmodel') is not None:
+    st.dataframe(st.session_state['finalmodel'])
+else:
+    st.info("Data will appear here once scraped and processed.")
