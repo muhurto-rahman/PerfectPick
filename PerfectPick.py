@@ -150,7 +150,7 @@ if len(chosenteammates) == 4 and st.session_state['scraped_data'] is not None:
     # I want my current comp rank, team composition,
     # the number of points I won by, 
     # and the binary column of victory. 
-    teamdf = pdata.iloc[1:250,].reset_index()
+    teamdf = pdata.iloc[1:pdata.shape[0],].reset_index()
     valorantagents = ["brimstone",'phoenix','sage','sova',
                     'viper','cypher','reyna','killjoy',
                     'breach','omen','jett','raze',
@@ -164,7 +164,7 @@ if len(chosenteammates) == 4 and st.session_state['scraped_data'] is not None:
         teamdf[i] = teamdf[i].astype(float)
     #Right now we are counting ties as defeats for model simplicity, might try to predict on delta points to account for this
     for i in valorantagents:
-        teamdf[i] = np.zeros(249).tolist()
+        teamdf[i] = np.zeros(pdata.shape[0]-1).tolist()
     teamdf["Victory"] = np.where(teamdf["RoundWins"] > teamdf["RoundLosses"],1,0)
     teamdf["DeltaScore"] = teamdf["RoundWins"] - teamdf["RoundLosses"]
     #Now we group our long agent list into groups of 4 (4 other players on our team), so they align with each round
@@ -285,5 +285,7 @@ if len(chosenteammates) == 4 and st.session_state['scraped_data'] is not None:
 
 if st.session_state.get('finalmodel') is not None:
     st.dataframe(st.session_state['finalmodel'])
+    #This is just here for troubleshooting
+    #st.write(winratelist)
 else:
     st.info("Data will appear here once scraped and processed.")
