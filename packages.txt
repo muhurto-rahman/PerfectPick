@@ -1,6 +1,5 @@
 wget
 curl
 unzip
-
-chromium-driver
 chromium
+chromium-driver
