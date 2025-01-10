@@ -59,7 +59,7 @@ if len(chosenteammates) == 4 and profileid != st.session_state["last_scraped_pro
         try:
             st.session_state["last_scraped_profileid"] = profileid
             # STEP 2: Webscrape their u.gg profile (Approximately 5 minutes to run this part)
-            service = Service(executable_path="/usr/bin/chromedriver")
+            service = Service(executable_path="/usr/bin/chromium")
             driver = webdriver.Chrome(service = service)
             driver.get(f"https://u.gg/val/profile/{profileid.replace(' ','%20').replace('#','-')}")
             time.sleep(5)
