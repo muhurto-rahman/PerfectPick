@@ -37,6 +37,10 @@ st.write("""PerfectPick is your go-to Valorant agent selector for clutch team co
 
 st.write("\n")
 
+st.write("""
+To use this program, make sure your u.gg profile is public (https://u.gg/val). The more competetive matches you've played, the more data our model has to be better trained.
+""")
+
 st.write("Input your username below:")
 getprofileid = st.text_input(label = "Profile-Id", value = "Muhurto#7071")
 container = st.container(border = True)
