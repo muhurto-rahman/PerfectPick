@@ -9,6 +9,7 @@ import os
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
@@ -18,12 +19,16 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, roc_auc_score
 from lightgbm import LGBMClassifier, LGBMRegressor
-from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 
+
+def get_driver():
+    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+#Fix selenium issues 
 options = Options()
 options.add_argument("--headless")
+options.add_argument('--disable-gpu')
 options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
 
 
 
@@ -66,8 +71,7 @@ if len(chosenteammates) == 4 and profileid != st.session_state["last_scraped_pro
         try:
             st.session_state["last_scraped_profileid"] = profileid
             # STEP 2: Webscrape their u.gg profile (Approximately 5 minutes to run this part)
-            service = Service(executable_path="/usr/bin/chromium")
-            driver = webdriver.Chrome(service = service, options = options)
+            driver = get_driver()
             driver.get(f"https://u.gg/val/profile/{profileid.replace(' ','%20').replace('#','-')}")
             time.sleep(5)
             while True:
