@@ -4,5 +4,7 @@ numpy
 requests
 beautifulsoup4
 selenium
+seleniumbase
 scikit-learn
 lightgbm
+webdriver-manager
