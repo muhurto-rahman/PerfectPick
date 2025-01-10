@@ -1,8 +1,6 @@
-# General dependencies for Selenium
 wget
 curl
 unzip
 
-# For using Chrome with Selenium
 chromium-driver
 chromium
