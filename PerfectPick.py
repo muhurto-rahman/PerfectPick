@@ -23,7 +23,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 def get_driver():
-    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    return webdriver.Chrome(service=Service(), options=options)
 #Fix selenium issues 
 options = Options()
 options.add_argument("--window-size=1920,1080")

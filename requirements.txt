@@ -3,8 +3,9 @@ pandas
 numpy
 requests
 beautifulsoup4
-selenium
+selenium = 4.11.2
 seleniumbase
 scikit-learn
 lightgbm
 webdriver-manager
+webdriver_manager
