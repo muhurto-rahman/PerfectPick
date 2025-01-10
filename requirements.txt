@@ -1,3 +1,12 @@
+streamlit
+pandas
+numpy
+requests
+beautifulsoup4
+selenium
+scikit-learn
+lightgbm
+
 aeppl==0.0.33
 aesara==2.7.9
 altair @ file:///C:/Users/dev-admin/perseverance-python-buildout/croot/altair_1699497320503/work
@@ -13,8 +22,6 @@ asttokens==2.4.1
 async-lru @ file:///home/conda/feedstock_root/build_artifacts/async-lru_1690563019058/work
 attrs @ file:///home/conda/feedstock_root/build_artifacts/attrs_1704011227531/work
 Babel @ file:///home/conda/feedstock_root/build_artifacts/babel_1702422572539/work
-bs4
-beautifulsoup4 
 binarytree==6.5.1
 bleach @ file:///home/conda/feedstock_root/build_artifacts/bleach_1696630167146/work
 blinker @ file:///C:/Users/dev-admin/perseverance-python-buildout/croot/blinker_1699474692786/work
