@@ -18,6 +18,13 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, roc_auc_score
 from lightgbm import LGBMClassifier, LGBMRegressor
+from selenium.webdriver.chrome.options import Options
+
+options = Options()
+options.add_argument("--headless")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+
 
 
 st.write("""PerfectPick is your go-to Valorant agent selector for clutch team compositions! When your teammates insta-lock their picks, simply enter your username and their selected agents. PerfectPick will suggest the best agents for you to play, complete with a predicted win rate based on your team’s synergy. Take the guesswork out of agent selection and secure your PerfectPick!
@@ -60,7 +67,7 @@ if len(chosenteammates) == 4 and profileid != st.session_state["last_scraped_pro
             st.session_state["last_scraped_profileid"] = profileid
             # STEP 2: Webscrape their u.gg profile (Approximately 5 minutes to run this part)
             service = Service(executable_path="/usr/bin/chromium")
-            driver = webdriver.Chrome(service = service)
+            driver = webdriver.Chrome(service = service, options = options)
             driver.get(f"https://u.gg/val/profile/{profileid.replace(' ','%20').replace('#','-')}")
             time.sleep(5)
             while True:
